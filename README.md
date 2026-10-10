@@ -10,6 +10,20 @@ On macOS, QuickTime shows about two seconds of video, freezes, and reports
 "Cannot record". After that the webcam function stays dead until the camera is
 unplugged and plugged back in. It fails the same way on Windows.
 
+## Download
+
+**[Download TR256E Camera](https://github.com/jvanderberg/tr256e-cam/releases/latest/download/TR256E-Camera.zip)**
+(signed and notarized; macOS 15 or later, Apple Silicon)
+
+1. Unzip it and move **TR256E Camera** to `/Applications`. The camera extension
+   won't install from anywhere else.
+2. Open it, then click **Install / Update** and **Enable**.
+3. In System Settings > General > Login Items & Extensions, allow the camera
+   extension, and allow "TR256E Camera" under Allow in the Background.
+4. Plug in the camera and pick **TR256E Thermal** in any app.
+
+To remove it, click **Uninstall** and **Disable** in the app, then delete it.
+
 ## What's wrong
 
 Short version: **the camera always sends H.264, whatever video format the
@@ -99,7 +113,9 @@ that, which is why the USB work lives in a separate daemon.
   the camera's broken built-in webcam function, and it will never work. Pick
   **TR256E Thermal** instead. Apps remember the choice.
 
-## Requirements
+## Building from source
+
+### Requirements
 
 - macOS 15 or later, on Apple Silicon (the helper links Homebrew's arm64 libusb)
 - Xcode 16
@@ -107,7 +123,7 @@ that, which is why the USB work lives in a separate daemon.
   which need the `com.apple.developer.system-extension.install` entitlement.
 - `brew install xcodegen libusb`
 
-## Build and install
+### Build and install
 
 The project is generated with XcodeGen from `project.yml`. It's set up for the
 original author's team and bundle IDs, which can't be reused on another
@@ -185,5 +201,10 @@ documented anywhere.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+The helper statically links [libusb](https://libusb.info), which is licensed
+under the [LGPL-2.1](https://github.com/libusb/libusb/blob/master/COPYING). The
+complete source for this project is in this repository, so you can rebuild it
+against any libusb you like.
 
 Not affiliated with Mileseey.
