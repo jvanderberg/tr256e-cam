@@ -2,7 +2,7 @@
 
 A macOS camera extension that makes the **Mileseey TR256E** thermal camera work as a
 normal webcam. Once installed, a camera called **TR256E Thermal** shows up in
-QuickTime, Photo Booth, FaceTime, Zoom, browsers and anything else that uses
+QuickTime, FaceTime, Zoom, browsers and anything else that uses
 AVFoundation.
 
 Plugged in over USB-C, the camera presents itself as a webcam ("UVC Camera 0").
@@ -98,8 +98,6 @@ that, which is why the USB work lives in a separate daemon.
 - **"UVC Camera 0" still shows up in camera menus.** That's macOS's driver for
   the camera's broken built-in webcam function, and it will never work. Pick
   **TR256E Thermal** instead. Apps remember the choice.
-- **Photo Booth mirrors the picture.** It mirrors every camera. Recordings
-  made by other apps aren't mirrored.
 
 ## Requirements
 
