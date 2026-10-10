@@ -1,0 +1,87 @@
+name: TR256ECam
+options:
+  bundleIdPrefix: com.quirklocal
+  deploymentTarget:
+    macOS: "15.0"
+settings:
+  base:
+    DEVELOPMENT_TEAM: W83295YM5V
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+    ARCHS: arm64  # Homebrew's static libusb is arm64-only
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+
+targets:
+  TR256ECam:
+    type: application
+    platform: macOS
+    sources:
+      - App
+      - path: Helper/com.quirklocal.tr256ecam.helper.plist
+        buildPhase:
+          copyFiles:
+            destination: wrapper
+            subpath: Contents/Library/LaunchDaemons
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.quirklocal.tr256ecam
+        PRODUCT_NAME: TR256E Camera
+        CODE_SIGN_ENTITLEMENTS: App/App.entitlements
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: TR256E Camera
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+    dependencies:
+      - target: CameraExtension
+        embed: true
+      - target: tr256e-helper
+        embed: true
+        codeSign: false
+        copy:
+          destination: executables
+
+  CameraExtension:
+    type: system-extension
+    platform: macOS
+    sources:
+      - path: CameraExtension
+        excludes:
+          - Info.plist
+    info:
+      path: CameraExtension/Info.plist
+      properties:
+        CFBundleDisplayName: TR256E Thermal
+        CFBundlePackageType: SYSX
+        NSSystemExtensionUsageDescription: Provides the TR256E Thermal webcam.
+        CMIOExtension:
+          CMIOExtensionMachServiceName: $(TeamIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.quirklocal.tr256ecam.camera
+        PRODUCT_NAME: com.quirklocal.tr256ecam.camera
+        CODE_SIGN_ENTITLEMENTS: CameraExtension/CameraExtension.entitlements
+        REGISTER_APP_GROUPS: YES
+        SKIP_INSTALL: YES
+
+  tr256e-helper:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Helper
+        excludes:
+          - "*.plist"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.quirklocal.tr256ecam.helper
+        PRODUCT_NAME: tr256e-helper
+        HEADER_SEARCH_PATHS: /opt/homebrew/include/libusb-1.0
+        OTHER_LDFLAGS:
+          - /opt/homebrew/lib/libusb-1.0.a
+          - -framework
+          - IOKit
+          - -framework
+          - CoreFoundation
+          - -framework
+          - Security
+        SKIP_INSTALL: YES
