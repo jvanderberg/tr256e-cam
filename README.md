@@ -13,8 +13,8 @@ unplugged and plugged back in. It fails the same way on Windows.
 ## What's wrong
 
 Short version: **the camera always sends H.264, whatever video format the
-computer asks for.** The details below come from reading the camera's USB
-descriptors and streaming from it directly with libusb.
+computer asks for.** The details below come from the camera's USB descriptors
+and from streaming it directly with libusb.
 
 ### What the camera presents over USB
 
@@ -45,15 +45,13 @@ A host picks a format by sending a UVC probe/commit request with the format's
 index, then reads the stream. When asked for **MJPEG (index 3)**, the camera
 streamed H.264 anyway: an Annex-B elementary stream, High profile, 256x342, with
 SPS/PPS and an IDR frame every 2 seconds. That's what you'd get from index 2.
-The raw dump decodes cleanly with ffmpeg once the stream is labeled as H.264.
 
 ### Why the computer gives up
 
 AVFoundation's capture modes for this device are uncompressed pixel formats
 (`uyvy422`, `yuyv422`, `nv12`, ...). When macOS negotiates one of those, the
-data that arrives doesn't match the format or frame size it asked for. Through
-AVFoundation, the stream delivered 13 frames and then nothing. QuickTime holds
-on for about two seconds before giving up. The streaming interface is then left
+data that arrives doesn't match the format or frame size it asked for, and the
+stream stops after a couple of seconds. The streaming interface is then left
 mid-stream, and nothing recovers it short of re-plugging the camera.
 
 Reading the same endpoint directly with libusb, requesting H.264 and treating
@@ -100,15 +98,6 @@ that, which is why the USB work lives in a separate daemon.
 - **"UVC Camera 0" still shows up in camera menus.** That's macOS's driver for
   the camera's broken built-in webcam function, and it will never work. Pick
   **TR256E Thermal** instead. Apps remember the choice.
-- **QuickTime may say "The operation could not be completed"** as soon as you
-  open a new movie recording. QuickTime opens the last camera you used. If that
-  was UVC Camera 0, start with the thermal camera unplugged and choose TR256E
-  Thermal from the menu next to the record button. Or set it directly:
-  ```sh
-  defaults write com.apple.QuickTimePlayerX \
-    MGDeviceRecordingDocumentViewControllerVideoDeviceSelectionUniqueID \
-    -string F6BD0896-F004-4AE6-A37F-6F520AC1EA17
-  ```
 - **Photo Booth mirrors the picture.** It mirrors every camera. Recordings
   made by other apps aren't mirrored.
 
@@ -175,8 +164,6 @@ tail -f /var/log/tr256e-helper.log      # helper: claims, streams, frame counts
 systemextensionsctl list
 ffmpeg -f avfoundation -list_devices true -i ""
 ```
-
-In zsh, `log` is a shell builtin, so use `/usr/bin/log`.
 
 ## Bonus: the photos contain temperature data
 
